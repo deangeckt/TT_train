@@ -31,8 +31,7 @@ training:
 - attention - allow to handle more thrn 30 frames
 
 ## Read:
-https://www.tensorflow.org/lite/tutorials/pose_classification
-impl of the above
-https://www.youtube.com/watch?v=aySurynUNAw
-
-https://web.stanford.edu/class/cs231a/prev_projects_2016/final%20(1).pdf
+- https://www.tensorflow.org/lite/tutorials/pose_classification
+- impl of the above
+- https://www.youtube.com/watch?v=aySurynUNAw
+- https://web.stanford.edu/class/cs231a/prev_projects_2016/final%20(1).pdf
