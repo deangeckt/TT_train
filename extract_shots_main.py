@@ -73,5 +73,5 @@ def extract_from_file(full_path):
 # data_df.to_csv('labels/fts_data.csv')
 
 
-pos = extract_from_file(r'data/fco/fco_12_5.mp4')
+pos = extract_from_file(r'data_examples/fco/fco_12_5.mp4')
 

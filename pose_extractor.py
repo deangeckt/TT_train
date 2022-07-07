@@ -84,6 +84,8 @@ class shotsExtractor:
     def debug_save_shots(self):
         type_ = self.file_name.split('_')[0]
         dir_ = f'data_shots/{type_}'
+        os.makedirs(dir_, exist_ok=True)
+
         dir_path = '{}/{}'.format(dir_, self.file_name)
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
