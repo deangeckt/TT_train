@@ -1,11 +1,8 @@
-import os
-
 import cv2
-import time
 import pandas as pd
 from tqdm import tqdm
 
-from TT_trainer.post_est import PoseMovement
+from TT_trainer.pose_extractor import shotsExtractor
 
 params = {'fts': {'mv_th': 0.6, 'mv_wd': 3, 'len': 6, 'shots_delta': 3},
           'fch': {'mv_th': 0.0, 'mv_wd': 5, 'len': 6, 'shots_delta': 3},
@@ -19,7 +16,7 @@ params = {'fts': {'mv_th': 0.6, 'mv_wd': 3, 'len': 6, 'shots_delta': 3},
 
 single_pose_data = ['x', 'y', 'z', 'vis']
 pose_columns = []
-for i in range(0, PoseMovement.pose_max_idx + 1):
+for i in range(0, shotsExtractor.pose_max_idx + 1):
     pose_columns.extend(['{}_{}'.format(i, key) for key in single_pose_data])
 
 score_df = pd.DataFrame(columns=['score', 'shot', 'frames'])
@@ -38,8 +35,8 @@ def extract_from_file(full_path):
     length = params[mv_key]['len']
     shots_delta = params[mv_key]['shots_delta']
 
-    pos = PoseMovement(mv_wd=mv_wd, mv_th=mv_th, shots_delta=shots_delta,
-                       length=length, file_name=file_name)
+    pos = shotsExtractor(mv_wd=mv_wd, mv_th=mv_th, shots_delta=shots_delta,
+                         length=length, file_name=file_name)
 
     vid = cv2.VideoCapture(full_path)
     _, img = vid.read()
@@ -58,14 +55,13 @@ def extract_from_file(full_path):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-
     # DEBUG
     cv2.destroyAllWindows()
     pos.debug_plot_diffs()
     # pos.debug_save_shots()
     return pos
 
-    # REAL
+    # REAL - run on all folder!
     # pos.save_shots_labeled_csv(score_df, data_df)
 
 

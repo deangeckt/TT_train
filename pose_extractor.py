@@ -18,7 +18,7 @@ def pose_est(img):
         # mpDraw.plot_landmarks(results.pose_world_landmarks, mpPose.POSE_CONNECTIONS)
         mpDraw.draw_landmarks(img, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
         for id, lm in enumerate(results.pose_landmarks.landmark):
-            if id > PoseMovement.pose_max_idx:
+            if id > shotsExtractor.pose_max_idx:
                 continue
             res.append(lm)
             # h, w, c = img.shape
@@ -39,7 +39,7 @@ def get_landmarks_diff(landmarks: list, coord: str):
     return np.mean(np.abs(np.diff(arr)))
 
 
-class PoseMovement:
+class shotsExtractor:
     right_hand = [12, 14, 16, 18, 20, 22]
     left_hand = [11, 13, 15, 17, 19, 21]
     pose_max_idx = 24
@@ -70,7 +70,7 @@ class PoseMovement:
                 data_key = '{}_{}_{}'.format(self.file_name, mv_idx, fr_idx)
                 data_df.loc[data_key] = {}
                 for pos_idx, pos in enumerate(self.pose[frame]):
-                    if pos_idx > PoseMovement.pose_max_idx:
+                    if pos_idx > shotsExtractor.pose_max_idx:
                         break
                     data_df.loc[data_key]['{}_x'.format(pos_idx)] = pos.x
                     data_df.loc[data_key]['{}_y'.format(pos_idx)] = pos.y
@@ -156,7 +156,7 @@ class PoseMovement:
             return
 
         curr_frame = total_frames - self.mv_wd
-        mv_metric = self.get_change(frame_count=self.mv_wd, pose_idxs=PoseMovement.right_hand)
+        mv_metric = self.get_change(frame_count=self.mv_wd, pose_idxs=shotsExtractor.right_hand)
         if mv_metric is None:
             return
 
