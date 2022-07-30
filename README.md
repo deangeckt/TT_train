@@ -5,7 +5,7 @@ the py files: are the extraction utils, and the notebook is for training. i sugg
 
 ## Tasks: (by order)
 - labeling the csv in labels/ - WIP - Dean
-
+- fix "read_data" function in the notebook - convert csv to binary labels 
 training:
 - create Network
 	- LSTM of HW + attention 
