@@ -16,7 +16,7 @@ def pose_est(img):
     results = pose.process(img)
     if results.pose_landmarks:
         # mpDraw.plot_landmarks(results.pose_world_landmarks, mpPose.POSE_CONNECTIONS)
-        mpDraw.draw_landmarks(img, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
+        # mpDraw.draw_landmarks(img, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
         for id, lm in enumerate(results.pose_landmarks.landmark):
             if id > shotsExtractor.pose_max_idx:
                 continue
@@ -44,14 +44,17 @@ class shotsExtractor:
     left_hand = [11, 13, 15, 17, 19, 21]
     pose_max_idx = 24
 
-    def __init__(self, file_name, mv_wd, mv_th, shots_delta, length):
+    def __init__(self, file_name, mv_wd, mv_th, shots_delta, min_length):
         # thresholds
         self.mv_wd = mv_wd
         self.mv_th = mv_th
-        self.length = length
-        self.shots_delta = shots_delta
-
+        self.min_length = min_length
+        self.shots_delta = shots_delta  # unused
+        self.no_move_th = 50
         self.file_name = file_name
+        self.__reset()
+
+    def __reset(self):
         self.movements = []
         self.frames = []
         self.pose = []
@@ -134,6 +137,7 @@ class shotsExtractor:
         for idx in landmarks:
             x_ = get_landmarks_diff(landmarks[idx], 'x')
             y_ = get_landmarks_diff(landmarks[idx], 'y')
+            z_ = get_landmarks_diff(landmarks[idx], 'y')
             x_means.append(x_)
             y_means.append(y_)
 
@@ -149,9 +153,21 @@ class shotsExtractor:
 
         return None
 
+    def __is_no_move(self):
+        last_pose = self.pose[self.no_move_th:]
+        if not last_pose:
+            return
+        if len(last_pose) < self.no_move_th:
+            return
+
+        if last_pose.count(last_pose[0]) == len(last_pose):
+            print('No movement - reset!')
+            self.__reset()
+
     def process(self, img):
         self.frames.append(img)
         self.pose.append(pose_est(img))
+        self.__is_no_move()
 
         total_frames = len(self.frames)
         if total_frames < self.mv_wd:
@@ -167,18 +183,18 @@ class shotsExtractor:
             if self.mv_start_idx == -1:
                 if len(self.movements) > 0:
                     last_end = self.movements[-1]['e']
-                    if curr_frame - last_end < self.shots_delta:
-                        # print('extend due delta')
-                        last_mv = self.movements.pop()
-                        self.mv_start_idx = last_mv['s']
-                        return
+                    # if curr_frame - last_end < self.shots_delta:
+                    #     print('extend due delta')
+                    #     last_mv = self.movements.pop()
+                    #     self.mv_start_idx = last_mv['s']
+                    #     return
 
                 self.mv_start_idx = curr_frame
         else:
             if self.mv_start_idx != -1:
                 curr_len = curr_frame - self.mv_start_idx
                 if curr_len > self.mv_wd:
-                    if curr_len <= self.length:
+                    if curr_len <= self.min_length:
                         # print('reset due len ', curr_len)
                         self.mv_start_idx = -1
                         return

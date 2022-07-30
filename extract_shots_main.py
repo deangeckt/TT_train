@@ -1,7 +1,7 @@
 import cv2
 import pandas as pd
 from tqdm import tqdm
-
+import os
 from TT_trainer.pose_extractor import shotsExtractor
 
 params = {'fts': {'mv_th': 0.6, 'mv_wd': 3, 'len': 6, 'shots_delta': 3},
@@ -21,11 +21,9 @@ for i in range(0, shotsExtractor.pose_max_idx + 1):
 
 score_df = pd.DataFrame(columns=['score', 'shot', 'frames'])
 data_df = pd.DataFrame(columns=pose_columns)
-# score_df = pd.read_excel('labels/fco_score.xlsx', index_col='name')
-# data_df = pd.read_csv('labels/fco_data.csv', index_col='name')
 
 
-def extract_from_file(full_path):
+def extract_from_file(full_path, debug=True):
     mv_key = full_path.split('/')[1]
     file_name = full_path.split('/')[2].split('.mp4')[0]
     is_left = file_name.split('_')[-1] == 'l' or file_name.split('_')[-1] == 'L'
@@ -36,7 +34,7 @@ def extract_from_file(full_path):
     shots_delta = params[mv_key]['shots_delta']
 
     pos = shotsExtractor(mv_wd=mv_wd, mv_th=mv_th, shots_delta=shots_delta,
-                         length=length, file_name=file_name)
+                         min_length=length, file_name=file_name)
 
     vid = cv2.VideoCapture(full_path)
     _, img = vid.read()
@@ -44,34 +42,36 @@ def extract_from_file(full_path):
         success, img = vid.read()
         if not success:
             break
-
         if is_left:
             img = cv2.flip(img, 1)
+
         pos.process(img)
-        imS = cv2.resize(img, (540, 1000))  # Resize image
 
-        cv2.imshow("Vid", imS)
+        if debug:
+            imS = cv2.resize(img, (540, 1000))  # Resize image
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+            cv2.imshow("Vid", imS)
 
-    # DEBUG
-    cv2.destroyAllWindows()
-    pos.debug_plot_diffs()
-    # pos.debug_save_shots()
-    return pos
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
-    # REAL - run on all folder!
-    # pos.save_shots_labeled_csv(score_df, data_df)
+    if debug:
+        cv2.destroyAllWindows()
+        pos.debug_plot_diffs()
+        pos.debug_save_shots()
+        return pos
 
-
-# dir_path = 'data/fts'
-# for fname in tqdm(os.listdir(dir_path)):
-#     extract_from_file('{}/{}'.format(dir_path, fname))
-
-# score_df.to_csv('labels/fts_score.csv')
-# data_df.to_csv('labels/fts_data.csv')
+    if not debug:
+        pos.save_shots_labeled_csv(score_df, data_df)
 
 
-pos = extract_from_file(r'data_examples/fco/fco_12_5.mp4')
+shot_type = 'fco'
+dir_path = f'data/{shot_type}'
+for fname in tqdm(os.listdir(dir_path)):
+    extract_from_file('{}/{}'.format(dir_path, fname), debug=False)
+
+score_df.to_csv(f'labels/{shot_type}_score.csv')
+data_df.to_csv(f'labels/{shot_type}_data.csv')
+
+# pos = extract_from_file(r'data/fts/fts_25_9.mp4', debug=True)
 
