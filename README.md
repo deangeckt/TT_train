@@ -4,12 +4,11 @@
 the py files: are the extraction utils, and the notebook is for training. i suggest we have 2 notebooks each.
 
 ## Tasks:
-- labeling the csv in labels/ - WIP Dean
 - fix "read_data" function in the notebook - convert csv to binary labels - WIP Dean.
 - create Network
 	- LSTM of HW + attention 
 	- dataloader (SEQ len , currently 50, maybe 30 ?) (in the end aug goes here)
-- data augmantation + debug - WIP Adi
+- data augmentation + debug - WIP Adi
     - plot landmarks of a frame
     - animate landmarks of a shot
 	- create aug data function
