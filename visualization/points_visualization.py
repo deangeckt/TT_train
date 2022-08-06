@@ -3,21 +3,27 @@ import pandas as pd
 import mediapipe as mp
 from tqdm import tqdm
 from PIL import Image
-#from costum_drawing_utils import costum_plot_landmarks
+from visualization.custom_drawing_utils import custom_plot_landmarks
 mpPose = mp.solutions.pose
 mpDraw = mp.solutions.drawing_utils
 
 
-def create_gif_for_shot(shot):
-    if not os.path.exists('shots_3d_demo/' + shot.name):
-        os.mkdir('shots_3d_demo/' + shot.name)
+
+def create_gif_for_given_shot(shot_name,frames_data):
+    shot = convert_frames_to_mp_landmarks_shots(shot_name, frames_data)
+    create_video_by_set_of_given_frames(shot)
+    
+
+def create_video_by_set_of_given_frames(shot):
+    if not os.path.exists('visualization/shots_3d_demo/' + shot.name):
+        os.mkdir('visualization/shots_3d_demo/' + shot.name)
     i = 0
     for frame in shot.frames:
         i += 1
         points = Points_world_landmarks(frame.fr_points)
-        plt = mpDraw.plot_landmarks(points, mpPose.POSE_CONNECTIONS)
+        plt = custom_plot_landmarks(points, mpPose.POSE_CONNECTIONS)
         plt.title(frame.name)
-        filename = 'shots_3d_demo/' + shot.name + '/' + shot.name + i.__str__() + '.png'
+        filename = 'visualization/shots_3d_demo/' + shot.name + '/' + shot.name + i.__str__() + '.png'
         plt.savefig(filename, dpi=75)
 
     files = []
@@ -28,17 +34,17 @@ def create_gif_for_shot(shot):
 
     frames = []
     for i in files:
-        new_frame = Image.open("shots_3d_demo/" + shot.name + '/' + i)
+        new_frame = Image.open("visualization/shots_3d_demo/" + shot.name + '/' + i)
         frames.append(new_frame)
 
     # Save into a GIF file that loops forever
-    frames[0].save("shots_3d_demo/" + shot.name + '.gif', format='GIF',
+    frames[0].save("visualization/shots_3d_demo/" + shot.name + '.gif', format='GIF',
                    append_images=frames[1:],
                    save_all=True,
                    duration=500, loop=0)
 
 
-def arrange_data_from_data_frame(file_name, frames):
+def convert_frames_to_mp_landmarks_shots(file_name, frames):
     frames_t = []
     for row in frames:
         landmark = []
@@ -62,49 +68,6 @@ def arrange_data_from_data_frame(file_name, frames):
         frames_t.append(Frame(landmark, file_name))
     full_shots = Shot(frames_t, file_name)
     return full_shots
-
-
-def read_data_from_csv(path):
-    frames = []
-    full_Shots = []
-    prev_hit_number = 0
-    data_df = pd.read_csv(file_path, nrows=20)
-    for _, row in tqdm(data_df.iterrows()):
-        landmark = []
-        index = 0
-
-        frame_name = row[0]
-        frame_name_splited = frame_name.split("_")
-        shot_name = ""
-        for part in range(len(frame_name_splited)-1):
-            shot_name += frame_name_splited[part] + '_'
-
-        hit_number = frame_name_splited[len(frame_name_splited)-2]
-        if int(hit_number) != int(prev_hit_number):
-            full_Shots.append(Shot(frames, shot_name))
-            frames = []
-            prev_hit_number = hit_number
-        for col in row:
-            if index == 1:
-                land = Landmark(col, 0, 0, 0)
-            elif index == 2:
-                land.y = col
-            elif index == 3:
-                land.z = col
-            elif index == 4:
-                land.visibility = col
-                landmark.append(land)
-                index = 0
-            index += 1
-
-        # mediapipe func needs 35 landmarks so (0,0,0) points were added
-        for i in range(10):
-            land = Landmark(0, 0, 0, 0.4)
-            landmark.append(land)
-        frames.append(Frame(landmark, frame_name))
-
-    return full_Shots
-
 
 class Frame:
     def __init__(self, fr_points , name):
@@ -135,11 +98,6 @@ class Points_world_landmarks:
     def __init__(self, landmark):
         self.landmark = landmark
 
-
-file_path = 'labels/fco_data.csv'
-# full_Shots = read_data_from_csv(file_path)
-#for shot in full_Shots:
-    #create_gif_for_shot(shot)
 
 
 
