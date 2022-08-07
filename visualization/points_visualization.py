@@ -15,6 +15,8 @@ def create_gif_for_given_shot(shot_name,frames_data):
     
 
 def create_video_by_set_of_given_frames(shot):
+    if not os.path.exists('visualization/shots_3d_demo/'):
+        os.mkdir('visualization/shots_3d_demo/')
     if not os.path.exists('visualization/shots_3d_demo/' + shot.name):
         os.mkdir('visualization/shots_3d_demo/' + shot.name)
     i = 0
