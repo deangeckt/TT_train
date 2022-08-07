@@ -99,7 +99,10 @@ class Points_world_landmarks:
         self.landmark = landmark
 
 
-
-
+# Example - run this code to display the gif that was created
+# from IPython.display import Image
+#
+# with open('./fts_10_7.5_3.gif','rb') as f:
+#     display(Image(data=f.read(), format='png'))
 
 
