@@ -1,3 +1,5 @@
+import os
+
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -35,7 +37,7 @@ def calculate_acc(model, dataset_loader, device, batch_size):
     return acc
 
 
-def plot_results(train_, valid_, patience, unit):
+def plot_results(train_, valid_, patience, unit, model_name):
     plt.figure()
     plt.plot(train_, label='train')
     plt.plot(valid_, label='validation')
@@ -44,12 +46,16 @@ def plot_results(train_, valid_, patience, unit):
     plt.xlabel('Epochs')
     plt.ylabel(unit)
     plt.legend()
+    model_name = model_name.split('pt')[0]
+    plt.savefig(f'model_results/{unit}_{model_name}.jpg')
     plt.show()
 
 
 def train_model(model, model_name, batch_size, device, patience,
                 train_loader, validation_loader, test_loader,
                 optimizer, scheduler, loss_fn):
+    os.makedirs(r'model_results', exist_ok=True)
+
     train_loss = []
     valid_loss = []
     train_acc = []
@@ -95,16 +101,16 @@ def train_model(model, model_name, batch_size, device, patience,
         if val_loss < min_val_lost:
             min_val_lost = val_loss
             j = 0
-            torch.save(model.state_dict(), model_name)
+            torch.save(model.state_dict(), 'model_results/' + model_name)
         else:
             j += 1
 
         i += 1
 
-    model.load_state_dict(torch.load(model_name))
+    model.load_state_dict(torch.load('model_results/' + model_name))
     model.eval()
     test_accuracy = calculate_acc(model, test_loader, device, batch_size)
     print(f'Test accuracy: {test_accuracy}')
 
-    plot_results(train_loss, valid_loss, patience, 'Loss')
-    plot_results(train_acc, val_acc, patience, 'Accuracy')
+    plot_results(train_loss, valid_loss, patience, 'Loss', model_name)
+    plot_results(train_acc, val_acc, patience, 'Accuracy', model_name)
