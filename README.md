@@ -15,7 +15,7 @@
 - brnn seem good
 - not alot of layers
 - gru > lstm (lstm is to complicated )
-- attention - allow to handle more thrn 30 frames
+- attention - allow to handle more than 30 frames
 
 ## Read:
 - https://www.tensorflow.org/lite/tutorials/pose_classification

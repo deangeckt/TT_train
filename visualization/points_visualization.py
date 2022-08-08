@@ -8,8 +8,7 @@ mpPose = mp.solutions.pose
 mpDraw = mp.solutions.drawing_utils
 
 
-
-def create_gif_for_given_shot(shot_name,frames_data):
+def create_gif_for_given_shot(shot_name, frames_data):
     shot = convert_frames_to_mp_landmarks_shots(shot_name, frames_data)
     create_video_by_set_of_given_frames(shot)
     
