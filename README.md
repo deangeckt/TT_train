@@ -2,8 +2,7 @@
 
 
 ## Tasks:
-- attention impl
-- feature selection - details inside train notebook
+- attention
 - normalize input - see Read below
 - data augmentation
 - experiments: every experiment should be documented during the process in the pptx
