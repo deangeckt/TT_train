@@ -77,7 +77,7 @@ def plot_results(train_, valid_, patience, unit, model_name):
     plt.xlabel('Epochs')
     plt.ylabel(unit)
     plt.legend()
-    model_name = model_name.split('pt')[0]
+    model_name = model_name.split('.pt')[0]
     plt.savefig(f'model_results/{unit}_{model_name}.jpg')
     plt.show()
 
