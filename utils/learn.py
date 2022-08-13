@@ -22,8 +22,10 @@ def validation_loss(model, val_loader, device, batch_size, loss_fn):
 
 def predict(model, test_loader, device, batch_size):
     pred = []
+    gt = []
     correct_idx = []
     wrong_idx = []
+    orig_idx = []
 
     with torch.no_grad():
         for batch in test_loader:
@@ -34,14 +36,18 @@ def predict(model, test_loader, device, batch_size):
             y_pred = torch.argmax(y_pred_log_proba, dim=1).view(batch_size)
 
             pred.extend(y_pred)
+            gt.extend(y)
+            orig_idx.extend(idx)
             correct_idx.extend((idx[y_pred == y.to(device)]))
             wrong_idx.extend((idx[y_pred != y.to(device)]))
 
     correct_idx = [i.item() for i in correct_idx]
     wrong_idx = [i.item() for i in wrong_idx]
     pred = [i.item() for i in pred]
+    gt = [i.item() for i in gt]
+    orig_idx = [i.item() for i in orig_idx]
 
-    return correct_idx, wrong_idx, pred
+    return correct_idx, wrong_idx, pred, gt, orig_idx
 
 
 def calculate_acc(model, dataset_loader, device, batch_size):
