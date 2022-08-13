@@ -20,12 +20,33 @@ def validation_loss(model, val_loader, device, batch_size, loss_fn):
     return np.mean(losses)
 
 
-def calculate_acc(model, dataset_loader, device, batch_size, analysis=False):
-    n_correct = 0
-    n_total = 0
-
+def predict(model, test_loader, device, batch_size):
+    pred = []
     correct_idx = []
     wrong_idx = []
+
+    with torch.no_grad():
+        for batch in test_loader:
+            X, y, idx = batch
+            if X.shape[0] != batch_size:
+                break
+            y_pred_log_proba = model(X.to(device))
+            y_pred = torch.argmax(y_pred_log_proba, dim=1).view(batch_size)
+
+            pred.extend(y_pred)
+            correct_idx.extend((idx[y_pred == y.to(device)]))
+            wrong_idx.extend((idx[y_pred != y.to(device)]))
+
+    correct_idx = [i.item() for i in correct_idx]
+    wrong_idx = [i.item() for i in wrong_idx]
+    pred = [i.item() for i in pred]
+
+    return correct_idx, wrong_idx, pred
+
+
+def calculate_acc(model, dataset_loader, device, batch_size):
+    n_correct = 0
+    n_total = 0
 
     with torch.no_grad():
         for batch in dataset_loader:
@@ -37,16 +58,8 @@ def calculate_acc(model, dataset_loader, device, batch_size, analysis=False):
             n_correct += torch.sum(y_pred == y.to(device)).float().item()
             n_total += batch_size
 
-            if analysis:
-                correct_idx.extend((idx[y_pred == y.to(device)]))
-                wrong_idx.extend((idx[y_pred != y.to(device)]))
-
     acc = n_correct / n_total
-
-    correct_idx = [i.item() for i in correct_idx]
-    wrong_idx = [i.item() for i in wrong_idx]
-
-    return acc, correct_idx, wrong_idx
+    return acc
 
 
 def plot_results(train_, valid_, patience, unit, model_name):
@@ -103,9 +116,9 @@ def train_model(model, model_name, batch_size, device, patience,
         print("epoch {} | train loss : {} validation loss: {} ".format(i, tr_loss, val_loss))
 
         # Accuracy graphs
-        tr_acc, _, _ = calculate_acc(model, train_loader, device, batch_size)
+        tr_acc = calculate_acc(model, train_loader, device, batch_size)
         train_acc.append(tr_acc)
-        v_acc, _, _ = calculate_acc(model, validation_loader, device, batch_size)
+        v_acc = calculate_acc(model, validation_loader, device, batch_size)
         val_acc.append(v_acc)
         print("epoch {} | train acc : {} validation acc: {} ".format(i, tr_acc, v_acc))
 
@@ -121,7 +134,7 @@ def train_model(model, model_name, batch_size, device, patience,
 
     model.load_state_dict(torch.load('model_results/' + model_name))
     model.eval()
-    test_accuracy, _, _ = calculate_acc(model, test_loader, device, batch_size)
+    test_accuracy = calculate_acc(model, test_loader, device, batch_size)
     print(f'Test accuracy: {test_accuracy}')
 
     plot_results(train_loss, valid_loss, patience, 'Loss', model_name)
