@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import mediapipe as mp
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 from PIL import Image
 from visualization.custom_drawing_utils import custom_plot_landmarks
 mpPose = mp.solutions.pose
