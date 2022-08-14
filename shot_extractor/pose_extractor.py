@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import pandas as pd
 import mediapipe as mp
 import cv2
 from collections import defaultdict
@@ -21,11 +20,6 @@ def pose_est(img):
             if id > shotsExtractor.pose_max_idx:
                 continue
             res.append(lm)
-            # h, w, c = img.shape
-            # cx, cy = int(lm.x * w), int(lm.y * h)
-            # cv2.putText(img, str(id), (cx, cy),
-            #             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            # cv2.circle(img, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
     return res
 
 

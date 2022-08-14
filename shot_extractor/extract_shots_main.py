@@ -66,13 +66,13 @@ def extract_from_file(full_path, debug=True):
         pos.save_shots_labeled_csv(score_df, data_df)
 
 
-# shot_type = 'fco'
-# dir_path = f'data/{shot_type}'
-# for fname in tqdm(os.listdir(dir_path)):
-#     extract_from_file('{}/{}'.format(dir_path, fname), debug=False)
-#
-# score_df.to_csv(f'labels/{shot_type}_score.csv')
-# data_df.to_csv(f'labels/{shot_type}_data.csv')
+shot_type = 'fco'
+dir_path = f'data/{shot_type}'
+for fname in tqdm(os.listdir(dir_path)):
+    extract_from_file('{}/{}'.format(dir_path, fname), debug=False)
 
-pos = extract_from_file(r'data_examples/fco/fco_21_9.mp4', debug=True)
+score_df.to_csv(f'../labels/{shot_type}_score.csv')
+data_df.to_csv(f'../labels/{shot_type}_data.csv')
+
+# pos = extract_from_file(r'data_examples/fco/fco_21_9.mp4', debug=False)
 
