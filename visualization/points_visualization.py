@@ -10,9 +10,18 @@ vis_folder = 'visualization/shots_3d_demo'
 
 
 def create_gif_for_given_shot(shot_name, frames_data, amount, landmark_to_remove):
-    shot = convert_frames_to_mp_landmarks_shots(shot_name, frames_data, landmark_to_remove)
+    """
+    :param shot_name: name of the shot - will be saved in a new folder under this name
+    :param frames_data: the 3D matrix of a shot
+    :param amount: amount of none zero frames of the shot
+    :param landmark_to_remove: indices of landmarks to remove - make sure to filter the features
+    of the matrix via feature selection first
+    :return:
+    """
+    shot = convert_frames_to_mp_landmarks_shots(shot_name, frames_data, amount, landmark_to_remove)
     create_video_by_set_of_given_frames(shot)
-    
+    print(f'finished saving gif: {shot_name}')
+
 
 def create_video_by_set_of_given_frames(shot):
     os.makedirs(vis_folder, exist_ok=True)
@@ -23,21 +32,21 @@ def create_video_by_set_of_given_frames(shot):
     for frame in shot.frames:
         points = Points_world_landmarks(frame.fr_points)
         plt = custom_plot_landmarks(points, mpPose.POSE_CONNECTIONS)
-        plt.ioff()
 
         plt.title(f'{shot.name}_{frame.name}')
         filename = f'{shot_folder}/{shot.name}_{frame.name}.png'
         plt.savefig(filename, dpi=75)
+        plt.close()
         frames.append(Image.open(filename))
 
     # Save into a GIF file that loops forever
     frames[0].save(f'{shot_folder}.gif', format='GIF',
                    append_images=frames[1:],
                    save_all=True,
-                   duration=250, loop=0)
+                   duration=150, loop=0)
 
 
-def convert_frames_to_mp_landmarks_shots(file_name, frames, landmark_to_remove):
+def convert_frames_to_mp_landmarks_shots(file_name, frames, amount, landmark_to_remove):
     frames_t = []
 
     for fr_idx, row in enumerate(frames):
@@ -45,7 +54,7 @@ def convert_frames_to_mp_landmarks_shots(file_name, frames, landmark_to_remove):
         landmark_index = 0
         for i in range(0, 24):
             if i in landmark_to_remove:
-                land = Landmark(0, 0, 0, 0.4)
+                land = Landmark(0, 0, 0, 0.0)
                 landmark.append(land)
             else:
                 land = Landmark(row[landmark_index].item(),
@@ -57,9 +66,12 @@ def convert_frames_to_mp_landmarks_shots(file_name, frames, landmark_to_remove):
 
         # landmark 25-32 not our in use
         for i in range(10):
-            land = Landmark(0, 0, 0, 0.4)
+            land = Landmark(0, 0, 0, 0.0)
             landmark.append(land)
         frames_t.append(Frame(landmark, fr_idx))
+
+        if fr_idx >= amount - 1:
+            break
 
     full_shots = Shot(frames_t, file_name)
     return full_shots
@@ -93,12 +105,3 @@ class Landmark:
 class Points_world_landmarks:
     def __init__(self, landmark):
         self.landmark = landmark
-
-
-#points_visualization.create_gif_for_given_shot(names[3], data[3], head_landmarks)
-# Example - run this code to display the gif that was created
-# from IPython.display import Image
-# with open('./fts_10_7.5_3.gif','rb') as f:
-#     display(Image(data=f.read(), format='png'))
-
-
