@@ -11,6 +11,7 @@ vis_folder = 'visualization/shots_3d_demo'
 
 def create_gif_for_given_shot(shot_name, frames_data, amount, landmark_to_remove):
     """
+    visualize a shot landmarks
     :param shot_name: name of the shot - will be saved in a new folder under this name
     :param frames_data: the 3D matrix of a shot
     :param amount: amount of none zero frames of the shot
@@ -52,7 +53,7 @@ def convert_frames_to_mp_landmarks_shots(file_name, frames, amount, landmark_to_
     for fr_idx, row in enumerate(frames):
         landmark = []
         landmark_index = 0
-        for i in range(0, 24):
+        for i in range(0, 24 + 1):
             if i in landmark_to_remove:
                 land = Landmark(0, 0, 0, 0.0)
                 landmark.append(land)
