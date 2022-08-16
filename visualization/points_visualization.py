@@ -9,7 +9,7 @@ mpDraw = mp.solutions.drawing_utils
 vis_folder = 'visualization/shots_3d_demo'
 
 
-def create_gif_for_given_shot(shot_name, frames_data, amount, landmark_to_remove):
+def create_gif_for_given_shot(shot_name, frames_data, amount, landmark_to_remove=[]):
     """
     visualize a shot landmarks
     :param shot_name: name of the shot - will be saved in a new folder under this name
@@ -44,7 +44,7 @@ def create_video_by_set_of_given_frames(shot):
     frames[0].save(f'{shot_folder}.gif', format='GIF',
                    append_images=frames[1:],
                    save_all=True,
-                   duration=150, loop=0)
+                   duration=250, loop=0)
 
 
 def convert_frames_to_mp_landmarks_shots(file_name, frames, amount, landmark_to_remove):
