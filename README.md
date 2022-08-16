@@ -4,7 +4,6 @@
 ## Tasks:
 - attention impl
 - normalize input - see Read below
-- data augmentation
 - experiments: every experiment should be documented during the process in the pptx
 	- all data (both fco fts), just fts, just fco 
     - with/without: attention, feature selection, normalization, augmentation
