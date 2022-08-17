@@ -37,6 +37,7 @@ def read_raw_data(score_path, data_path):
 
     x = np.array(x)
     x = torch.from_numpy(x).float()
+
     return x, np.array(y), np.array(metadata)
 
 
