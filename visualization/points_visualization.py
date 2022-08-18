@@ -33,7 +33,7 @@ def create_vid_gif(vid_path, shot_name, amount):
     :param amount: amount of none zero frames of the shot
     :return: none
     """
-    vid_full_path = os.path.join(r'shot_extractor/data_shots', vid_path)
+    vid_full_path = f'shot_extractor/data_shots/{vid_path}'
     frames = []
     for i in range(amount):
         filename = f'{vid_full_path}/{shot_name}_{i}.jpg'
