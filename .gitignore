@@ -1,6 +1,6 @@
 /shot_extractor/data
 /shot_extractor/data_shots
-#/model_results/*.jpg
+/model_results/*.jpg
 /old
 __pycache__/
 .ipynb_checkpoints/
