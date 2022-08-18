@@ -49,7 +49,7 @@ def rand_shot(shot, amount, frame_prob=0.5):
     :param frame_prob: the probability to choose a frame and randomizes it to a new frame
     :return: random shot in the same shape of the given shot
     """
-    landmark_prob = 0.5
+    landmark_prob = 0.75
     x_prob, y_prob, z_prob = 0.5, 0.5, 0.5
     cord_change = (-0.01, 0.01)
     new_shot = shot.clone()
