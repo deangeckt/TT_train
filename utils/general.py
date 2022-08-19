@@ -49,28 +49,28 @@ def rand_shot(shot, amount, frame_prob=0.5):
     :param frame_prob: the probability to choose a frame and randomizes it to a new frame
     :return: random shot in the same shape of the given shot
     """
-    landmark_prob = 0.75
+    landmark_prob = 1
     x_prob, y_prob, z_prob = 0.5, 0.5, 0.5
     cord_change = (-0.01, 0.01)
     new_shot = shot.clone()
 
     for fr_idx in range(amount):
-        if random.random() < frame_prob:
+        if random.random() > frame_prob:
             continue
         frame = new_shot[fr_idx]
         if torch.equal(frame, torch.zeros(NUM_FEATURES)):
             continue
         for l_idx in right_hand:
-            if random.random() < landmark_prob:
+            if random.random() > landmark_prob:
                 continue
 
             landmark = frame[l_idx * 4: (l_idx * 4) + 4]
             x, y, z, _ = landmark
-            if random.random() > x_prob:
+            if random.random() < x_prob:
                 x += random.uniform(*cord_change)
-            if random.random() > y_prob:
+            if random.random() < y_prob:
                 y += random.uniform(*cord_change)
-            if random.random() > z_prob:
+            if random.random() < z_prob:
                 z += random.uniform(*cord_change)
 
             landmark[landmark > 1.0] = 1.0
