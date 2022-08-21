@@ -10,12 +10,14 @@ pose = mpPose.Pose()
 mpDraw = mp.solutions.drawing_utils
 
 
-def pose_est(img):
+def pose_est(img, use_draw=False):
     res = []
     results = pose.process(img)
     if results.pose_landmarks:
-        # mpDraw.plot_landmarks(results.pose_world_landmarks, mpPose.POSE_CONNECTIONS)
-        # mpDraw.draw_landmarks(img, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
+        if use_draw:
+            mpDraw.draw_landmarks(img, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
+            # mpDraw.plot_landmarks(results.pose_world_landmarks, mpPose.POSE_CONNECTIONS)
+
         for id, lm in enumerate(results.pose_landmarks.landmark):
             if id > shotsExtractor.pose_max_idx:
                 continue
@@ -38,7 +40,7 @@ class shotsExtractor:
     left_hand = [11, 13, 15, 17, 19, 21]
     pose_max_idx = 24
 
-    def __init__(self, file_name, mv_wd, mv_th, shots_delta, min_length):
+    def __init__(self, file_name, mv_wd, mv_th, shots_delta, min_length, e2e=False):
         # thresholds
         self.mv_wd = mv_wd
         self.mv_th = mv_th
@@ -46,6 +48,7 @@ class shotsExtractor:
         self.shots_delta = shots_delta  # unused
         self.no_move_th = 50
         self.file_name = file_name
+        self.e2e = e2e
         self.__reset()
 
     def __reset(self):
@@ -74,13 +77,13 @@ class shotsExtractor:
                     data_df.loc[data_key]['{}_z'.format(pos_idx)] = pos.z
                     data_df.loc[data_key]['{}_vis'.format(pos_idx)] = pos.visibility
 
-            score_key = '{}_{}'.format(self.file_name, mv_idx)
-            score_df.loc[score_key] = {'score': label_score, 'shot': mv_idx,
-                                       'frames': mv['e'] + 1 - mv['s']}
+                score_key = '{}_{}'.format(self.file_name, mv_idx)
+                score_df.loc[score_key] = {'score': label_score, 'shot': mv_idx,
+                                           'frames': mv['e'] + 1 - mv['s']}
 
     def debug_save_shots(self):
         type_ = self.file_name.split('_')[0]
-        dir_ = f'data_shots/{type_}'
+        dir_ = f'shot_extractor/data_shots/{type_}'
         os.makedirs(dir_, exist_ok=True)
 
         dir_path = '{}/{}'.format(dir_, self.file_name)
@@ -131,7 +134,6 @@ class shotsExtractor:
         for idx in landmarks:
             x_ = get_landmarks_diff(landmarks[idx], 'x')
             y_ = get_landmarks_diff(landmarks[idx], 'y')
-            z_ = get_landmarks_diff(landmarks[idx], 'y')
             x_means.append(x_)
             y_means.append(y_)
 
@@ -148,6 +150,8 @@ class shotsExtractor:
         return None
 
     def __is_no_move(self):
+        if self.e2e:
+            return
         last_pose = self.pose[self.no_move_th:]
         if not last_pose:
             return
@@ -160,7 +164,7 @@ class shotsExtractor:
 
     def process(self, img):
         self.frames.append(img)
-        self.pose.append(pose_est(img))
+        self.pose.append(pose_est(img, self.e2e))
         self.__is_no_move()
 
         total_frames = len(self.frames)
@@ -175,14 +179,6 @@ class shotsExtractor:
         dyn_metric = self.mv_th * np.mean(self.diffs['mxy'])
         if mv_metric >= dyn_metric:
             if self.mv_start_idx == -1:
-                if len(self.movements) > 0:
-                    last_end = self.movements[-1]['e']
-                    # if curr_frame - last_end < self.shots_delta:
-                    #     print('extend due delta')
-                    #     last_mv = self.movements.pop()
-                    #     self.mv_start_idx = last_mv['s']
-                    #     return
-
                 self.mv_start_idx = curr_frame
         else:
             if self.mv_start_idx != -1:

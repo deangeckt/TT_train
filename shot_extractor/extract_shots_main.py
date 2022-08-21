@@ -11,8 +11,6 @@ params = {'fts': {'mv_th': 0.6, 'mv_wd': 3, 'len': 6, 'shots_delta': 3},
           'bts': {'mv_th': 2, 'mv_wd': 3},
           'bch': {'mv_th': 2, 'mv_wd': 3},
           'bco': {'mv_th': 2, 'mv_wd': 3},
-          'home_test': {'mv_th': 0.6, 'mv_wd': 3, 'len': 6, 'shots_delta': 3},
-          'newfco': {'mv_th': 0.6, 'mv_wd': 3, 'len': 6, 'shots_delta': 3},
           }
 
 single_pose_data = ['x', 'y', 'z', 'vis']

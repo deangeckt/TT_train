@@ -9,24 +9,23 @@ NUM_FEATURES = 4 * 25  # 25 landmarks X 4 features each - x,y,z,vis
 right_hand = [12, 14, 16, 18, 20, 22]
 
 
-def read_raw_data(score_path, data_path):
+def read_raw_data(score_path, data_path, e2e=False):
     metadata = []
-    score_df = pd.read_csv(score_path)
-    data_df = pd.read_csv(data_path)
+    score_df = pd.read_csv(score_path) if type(score_path) == str else score_path
+    data_df = pd.read_csv(data_path) if type(data_path) == str else data_path
 
+    start_col = 0 if e2e else 1
     x = []
     y = []
     last_frame = 0
-
     for shot_index, row in tqdm(score_df.iterrows()):
         frames = row['frames']
         if frames >= SEQ_LEN:
             last_frame += frames
             continue
         score = row['score']
-        shot_name = row['name']
-
-        curr_shot = np.array(data_df.iloc[last_frame: frames + last_frame, 1:NUM_FEATURES + 1])
+        shot_name = row.name if e2e else row['name']
+        curr_shot = np.array(data_df.iloc[last_frame: frames + last_frame, start_col:NUM_FEATURES + 1])
         padding = np.zeros((SEQ_LEN - frames, NUM_FEATURES))
         curr_shot = np.vstack((curr_shot, padding))
         last_frame += frames
