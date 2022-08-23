@@ -10,7 +10,7 @@ pose = mpPose.Pose()
 mpDraw = mp.solutions.drawing_utils
 
 
-def pose_est(img, use_draw=False):
+def pose_est(img, use_draw):
     res = []
     results = pose.process(img)
     if results.pose_landmarks:

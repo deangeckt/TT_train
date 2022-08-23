@@ -57,20 +57,20 @@ def extract_from_file(full_path, debug=True):
     if debug:
         cv2.destroyAllWindows()
         pos.debug_plot_diffs()
-        pos.debug_save_shots()
+        # pos.debug_save_shots()
         return pos
 
     if not debug:
         pos.save_shots_labeled_csv(score_df, data_df)
 
 
-shot_type = 'fco'
-dir_path = f'data/{shot_type}'
-for fname in tqdm(os.listdir(dir_path)):
-    extract_from_file('{}/{}'.format(dir_path, fname), debug=False)
+# shot_type = 'fco'
+# dir_path = f'data/{shot_type}'
+# for fname in tqdm(os.listdir(dir_path)):
+#     extract_from_file('{}/{}'.format(dir_path, fname), debug=False)
+#
+# score_df.to_csv(f'../labels/{shot_type}_score.csv')
+# data_df.to_csv(f'../labels/{shot_type}_data.csv')
 
-score_df.to_csv(f'../labels/{shot_type}_score.csv')
-data_df.to_csv(f'../labels/{shot_type}_data.csv')
-
-# pos = extract_from_file(r'data_examples/fco/fco_21_9.mp4', debug=False)
+pos = extract_from_file(r'data/fco/fco_51_2_L.mp4', debug=True)
 

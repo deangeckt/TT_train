@@ -5,15 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def validation_loss(model, val_loader, device, batch_size, loss_fn):
+def validation_loss(model, val_loader, device, loss_fn):
     losses = []
-
+    batch_size = 1
     with torch.no_grad():
         for batch in val_loader:
             X, y, idx = batch
-            if X.shape[0] != batch_size:
-                break
-            y_pred_log_proba = model(X.to(device))
+            y_pred_log_proba = model(X.to(device), batch_size)
             loss = loss_fn(y_pred_log_proba, y.to(device).long())
             losses.append((loss.detach().cpu()))
 
@@ -31,7 +29,7 @@ def predict(model, test_loader, device, batch_size):
             X, y, idx = batch
             if X.shape[0] != batch_size:
                 break
-            y_pred_log_proba = model(X.to(device))
+            y_pred_log_proba = model(X.to(device), batch_size)
             y_pred = torch.argmax(y_pred_log_proba, dim=1).view(batch_size)
 
             pred.extend(y_pred)
@@ -56,7 +54,7 @@ def calculate_acc(model, dataset_loader, device, batch_size):
             X, y, idx = batch
             if X.shape[0] != batch_size:
                 break
-            y_pred_log_proba = model(X.to(device))
+            y_pred_log_proba = model(X.to(device), batch_size)
             y_pred = torch.argmax(y_pred_log_proba, dim=1).view(batch_size)
             n_correct += torch.sum(y_pred == y.to(device)).float().item()
             n_total += batch_size
@@ -100,7 +98,7 @@ def train_model(model, model_name, batch_size, device, patience,
             X, y, idx = batch
             if X.shape[0] != batch_size:
                 break
-            y_pred_log_proba = model(X.to(device))
+            y_pred_log_proba = model(X.to(device), batch_size)
             optimizer.zero_grad()
 
             loss = loss_fn(y_pred_log_proba, y.to(device).long())
@@ -114,14 +112,14 @@ def train_model(model, model_name, batch_size, device, patience,
         # Loss graphs
         tr_loss = np.mean(losses)
         train_loss.append(tr_loss)
-        val_loss = validation_loss(model, validation_loader, device, batch_size, loss_fn)
+        val_loss = validation_loss(model, validation_loader, device, loss_fn)
         valid_loss.append(val_loss)
         print("epoch {} | train loss : {} validation loss: {} ".format(i, tr_loss, val_loss))
 
         # Accuracy graphs
         tr_acc = calculate_acc(model, train_loader, device, batch_size)
         train_acc.append(tr_acc)
-        v_acc = calculate_acc(model, validation_loader, device, batch_size)
+        v_acc = calculate_acc(model, validation_loader, device, batch_size=1)
         val_acc.append(v_acc)
         print("epoch {} | train acc : {} validation acc: {} ".format(i, tr_acc, v_acc))
 
@@ -137,7 +135,7 @@ def train_model(model, model_name, batch_size, device, patience,
 
     model.load_state_dict(torch.load('model_results/' + model_name))
     model.eval()
-    test_accuracy = calculate_acc(model, test_loader, device, batch_size)
+    test_accuracy = calculate_acc(model, test_loader, device, batch_size=1)
     print(f'Test accuracy: {test_accuracy}')
 
     plot_results(train_loss, valid_loss, patience, 'Loss', model_name)
