@@ -20,9 +20,9 @@ def split_data():
     splits the raw csv data to constant train and test sets and save those
     :return: none
     """
-    shot_type = 'fco'
+    shot_type = 'fts'
 
-    sizes = {'fts': {'test_size': 50, 'val_size': 50},
+    sizes = {'fts': {'test_size': 75, 'val_size': 75},
              'fco': {'test_size': 50, 'val_size': 32},
              }
 

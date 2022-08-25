@@ -150,8 +150,8 @@ class shotsExtractor:
         return None
 
     def __is_no_move(self):
-        if self.e2e:
-            return
+        # if self.e2e:
+        #     return
         last_pose = self.pose[self.no_move_th:]
         if not last_pose:
             return

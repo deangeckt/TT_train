@@ -18,8 +18,9 @@ def validation_loss(model, val_loader, device, loss_fn):
     return np.mean(losses)
 
 
-def predict(model, test_loader, device, batch_size):
+def predict(model, test_loader, device, batch_size, th=0):
     pred = []
+    confs = []
     gt = []
     correct_idx = []
     wrong_idx = []
@@ -31,18 +32,24 @@ def predict(model, test_loader, device, batch_size):
                 break
             y_pred_log_proba = model(X.to(device), batch_size)
             y_pred = torch.argmax(y_pred_log_proba, dim=1).view(batch_size)
+            y_pred = y_pred.item()
 
-            pred.extend(y_pred)
-            gt.extend(y)
-            correct_idx.extend((idx[y_pred == y.to(device)]))
-            wrong_idx.extend((idx[y_pred != y.to(device)]))
+            conf = np.exp(y_pred_log_proba.cpu())
+            conf = conf[0][y_pred].item()
+            if y_pred == 1 and conf < th:
+                y_pred = 0
+                print('low conf: ', conf)
 
-    correct_idx = [i.item() for i in correct_idx]
-    wrong_idx = [i.item() for i in wrong_idx]
-    pred = [i.item() for i in pred]
-    gt = [i.item() for i in gt]
+            pred.append(y_pred)
+            confs.append(conf)
 
-    return correct_idx, wrong_idx, pred, gt
+            gt.append(y.item())
+            if (y_pred == y.to(device)).item():
+                correct_idx.append(idx.item())
+            else:
+                wrong_idx.append(idx.item())
+
+    return correct_idx, wrong_idx, pred, gt, confs
 
 
 def calculate_acc(model, dataset_loader, device, batch_size):
