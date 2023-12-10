@@ -129,6 +129,7 @@ class Network(nn.Module):
         else:
             cell_state = c_t[-1]
 
+        # local attention!
         classify_input = self.atten(cell_state, out) if self.use_attention else cell_state
         y = self.fc(classify_input)
 
