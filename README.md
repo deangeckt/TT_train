@@ -1,21 +1,14 @@
-# Table Tennis Train 
+# Table Tennis Shot Classification
 
+## Main goal: 
+The main goal of this project is to classify and distinguish between technically correct table tennis shot to one that is not.
 
-## Tasks:
-- normalize input - see Read below
-- experiments: every experiment should be documented during the process in the pptx
-	- all data (both fco fts), just fts, just fco 
-    - with/without: attention, feature selection, normalization, augmentation
+## Application:
+A real time mobile application used to improve player skill during practice.
 
-## Tips:
-- brnn seem good
-- not alot of layers
-- gru > lstm (lstm is to complicated )
-- attention - allow to handle more than 30 frames
+### Raw data
+the raw images are in the following format:
+https://github.com/user-attachments/assets/dfe4b49a-9353-40ea-8b23-e2973ef5a3a5
 
-## Read:
-- https://www.tensorflow.org/lite/tutorials/pose_classification
-  - this has normalize_pose_landmarks code that can be usefull
-- impl of the above
-- https://www.youtube.com/watch?v=aySurynUNAw
-- https://web.stanford.edu/class/cs231a/prev_projects_2016/final%20(1).pdf
+Thanks to Arik Shapira, the manager of TT [haifa team](https://tthaifa.co.il) for the data.
+
