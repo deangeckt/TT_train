@@ -8,7 +8,10 @@ A real time mobile application used to improve player skill during practice.
 
 ### Raw data
 the raw images are in the following format:
-https://github.com/user-attachments/assets/dfe4b49a-9353-40ea-8b23-e2973ef5a3a5
 
-Thanks to Arik Shapira, the manager of TT [haifa team](https://tthaifa.co.il) for the data.
+
+https://github.com/user-attachments/assets/abc818af-1adf-4233-b707-79e6cd19313b
+
+
+Thanks to Arik Shapira, the manager of TT [haifa team](https://tthaifa.co.il) for letting me film 🏓📸.
 
